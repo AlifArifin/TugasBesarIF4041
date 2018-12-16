@@ -78,3 +78,8 @@ amazon0312.txt
 amazon0505.txt
 amazon0601.txt
 ```
+## Contributor
+Muhamamad Treza Nolandra		13515080
+Daniel Christian Pradipta		13515020
+Muhammad Rafli Fadillah		13515115
+Muhammad Alif Arifin		13516078
