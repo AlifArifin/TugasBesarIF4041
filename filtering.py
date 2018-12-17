@@ -120,10 +120,14 @@ class TweetStreaming(StreamListener):
         json.dump(self.filters, self.outfile, indent=4)
         self.outfile.close()
 
+        self.outfile = open('all-filter.json', 'w')
+        json.dump(self.all, self.outfile, indent=4)
+        self.outfile.close()
+
         print ("Lama waktu streaming: ", str(self.limit), " detik") 
         print ("Data stream yang didapatkan: ", str(len(self.all)), " tweets")
         print ("Data stream yang berhasil di-filter: ", str(len(self.filters)), " tweets")
-        print ("Isi sampel (isi array merupakan index dari data stream)")
+        print ("Isi hasil filter (isi array merupakan index dari data stream)")
         for index in self.fill_filters :
             print("%03d" % index, end=" ")
 
@@ -132,7 +136,7 @@ if __name__ == '__main__':
         keys = json.load(f)
 
     # this handles Twitter authetification and the connection to Twitter Streaming API
-    l = TweetStreaming(keys, 20 * 60)
+    l = TweetStreaming(keys, 10 * 60)
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     stream = Stream(auth, l)
