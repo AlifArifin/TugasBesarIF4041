@@ -22,6 +22,7 @@ class SamplingDataStream() :
 
         # list of tweets sample
         self.samples = [] # container for sample
+        self.fill_sample = [] # container for index sample
 
     def reservoir(self, tweet) :
         # random sample of fixed size
@@ -41,11 +42,13 @@ class SamplingDataStream() :
             if (len(self.samples) < self.max_sample) :
                 # if samples is not full yet
                 self.samples.append(json.loads(tweet))
+                self.fill_sample.append(self.counter)
             else :
                 # find random number between 0 - 199 (because index is start from 0)
                 # then, change the tweet in that index with the new tweet
                 rand_index = randint(0, self.max_sample - 1)
                 self.samples[rand_index] = json.loads(tweet)
+                self.fill_sample[rand_index] = self.counter
             # end if
         # end if
         # if not then the tweet will be ignored
@@ -58,12 +61,14 @@ class TweetStreaming(StreamListener):
         # only stream tweet for time_limit (in seconds)
         self.start_time = time.time()
         self.limit = time_limit
+        self.all = []
 
         # class sampling
         self.sampling = SamplingDataStream(200)
 
         # file
         self.outfile = None
+        self.allfile = None
 
     # get the data (tweet)
     def on_data(self, data):
@@ -71,6 +76,7 @@ class TweetStreaming(StreamListener):
         if (time.time() - self.start_time) < self.limit :
             # do sampling (call sampling algorithm)
             self.sampling.reservoir(data)
+            self.all.append(json.loads(data))
             # for the feedback to makesure that the code is running
             print (self.sampling.counter)
             return True
@@ -89,6 +95,17 @@ class TweetStreaming(StreamListener):
         self.outfile = open('sample.json', 'w')
         json.dump(self.sampling.samples, self.outfile, indent=4)
         self.outfile.close()
+
+        self.allfile = open('all-sample.json', 'w')
+        json.dump(self.all, self.allfile, indent=4)
+        self.allfile.close()
+
+        print ("Lama waktu streaming: ", str(self.limit), " detik") 
+        print ("Data stream yang didapatkan: ", str(len(self.all)), " tweets")
+        print ("Data stream yang masuk ke dalam sample: ", str(len(self.sampling.samples)), " tweets")
+        print ("Isi sampel (isi array merupakan index dari data stream)")
+        for index in self.sampling.fill_sample :
+            print("%03d" % index, end=" ")
             
 if __name__ == '__main__':
 
